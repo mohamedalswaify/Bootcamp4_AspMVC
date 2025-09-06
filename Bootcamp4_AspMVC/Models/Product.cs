@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Bootcamp4_AspMVC.Models
 {
@@ -9,5 +10,10 @@ namespace Bootcamp4_AspMVC.Models
         public string Name { get; set; }
         public double Price { get; set; }
         public string? Description { get; set; }
+
+        [ForeignKey("Category")]
+        public int? CategoryId { get; set; }
+
+        public Category? Category { get; set; }
     }
 }

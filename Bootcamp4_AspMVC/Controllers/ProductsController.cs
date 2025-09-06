@@ -1,6 +1,8 @@
 ﻿using Bootcamp4_AspMVC.Data;
 using Bootcamp4_AspMVC.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bootcamp4_AspMVC.Controllers
 {
@@ -14,8 +16,136 @@ namespace Bootcamp4_AspMVC.Controllers
         }
         public IActionResult Index()
         {
-            IEnumerable<Product> Products = _context.Products.ToList();
+            IEnumerable<Product> Products = _context.Products.Include(c => c.Category).ToList();
             return View(Products);
         }
+
+
+
+
+        private void createList()
+        {
+            //IEnumerable<Category> categories = _context.Categories.ToList();
+            //SelectList selectListItems = new SelectList(categories,"Id","Name");
+            //ViewBag.Categories = selectListItems;
+
+            IEnumerable<Category> categories = _context.Categories.ToList();
+            ViewBag.Categories = categories;
+        }
+
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            createList();
+
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Create(Product product)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+
+                    return View(product);
+
+                }
+                _context.Products.Add(product);
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+
+            }
+            catch (Exception ex)
+            {
+                return Content("حدث خطا  غير متوقع يرجي مراجهة الدعم الفني:0565455252545");
+            }
+        }
+
+
+
+
+
+
+        [HttpGet]
+        public IActionResult Edit(int Id)
+        {
+            var products = _context.Products.Find(Id);
+            createList();
+            return View(products);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Product product)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+
+                    return View(product);
+
+                }
+                _context.Products.Update(product);
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+
+            }
+            catch (Exception ex)
+            {
+                return Content("حدث خطا  غير متوقع يرجي مراجهة الدعم الفني:0565455252545");
+            }
+        }
+
+
+
+
+
+
+
+        [HttpGet]
+        public IActionResult Delete(int Id)
+        {
+            var products = _context.Products.Find(Id);
+            return View(products);
+        }
+
+        [HttpPost]
+        public IActionResult Delete(Product product)
+        {
+            try
+            {
+                _context.Products.Remove(product);
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+
+            }
+            catch (Exception ex)
+            {
+                return Content("حدث خطا  غير متوقع يرجي مراجهة الدعم الفني:0565455252545");
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }
