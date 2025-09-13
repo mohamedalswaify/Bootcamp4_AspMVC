@@ -1,44 +1,40 @@
 ﻿using Bootcamp4_AspMVC.Data;
 using Bootcamp4_AspMVC.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Bootcamp4_AspMVC.Controllers
 {
-    public class EmployeesController : Controller
+    public class JobsController : Controller
     {
+
         private readonly ApplicationDbContext _context;
 
-        public EmployeesController(ApplicationDbContext context)
+        public JobsController(ApplicationDbContext context)
         {
             _context = context;
         }
+
+
+
+
+
+        [HttpGet]
         public IActionResult Index()
         {
-            IEnumerable<Employee> Products = 
-                _context.Employees
-                .Include(c => c.Department)
-                .Include(c => c.Job)
-                .ToList();
-            return View(Products);
-        }
+            try
+            {
+
+                IEnumerable<Job> depts = _context.Jobs.ToList();
+                return View(depts);
 
 
 
+            }
+            catch (Exception ex)
+            {
 
-
-        private void createList()
-        {
-            //IEnumerable<Category> categories = _context.Categories.ToList();
-            //SelectList selectListItems = new SelectList(categories,"Id","Name");
-            //ViewBag.Categories = selectListItems;
-
-            IEnumerable<Department> depts = _context.Departments.ToList();
-            ViewBag.Depts = depts;
-
-            IEnumerable<Job> jobs = _context.Jobs.ToList();
-            ViewBag.Jobs = jobs;
-
+                return Content("حدث خطا  غير متوقع يرجي مراجهة الدعم الفني:0565455252545");
+            }
         }
 
 
@@ -47,24 +43,21 @@ namespace Bootcamp4_AspMVC.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            createList();
-
-
             return View();
         }
 
         [HttpPost]
-        public IActionResult Create(Employee emp)
+        public IActionResult Create(Job job)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
 
-                    return View(emp);
+                    return View(job);
 
                 }
-                _context.Employees.Add(emp);
+                _context.Jobs.Add(job);
                 _context.SaveChanges();
                 return RedirectToAction("Index");
 
@@ -79,26 +72,26 @@ namespace Bootcamp4_AspMVC.Controllers
 
 
 
+
         [HttpGet]
         public IActionResult Edit(int Id)
         {
-            var emps = _context.Employees.Find(Id);
-            createList();
-            return View(emps);
+            var dept = _context.Jobs.Find(Id);
+            return View(dept);
         }
 
         [HttpPost]
-        public IActionResult Edit(Employee emp)
+        public IActionResult Edit(Job job)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
 
-                    return View(emp);
+                    return View(job);
 
                 }
-                _context.Employees.Update(emp);
+                _context.Jobs.Update(job);
                 _context.SaveChanges();
                 return RedirectToAction("Index");
 
@@ -118,16 +111,16 @@ namespace Bootcamp4_AspMVC.Controllers
         [HttpGet]
         public IActionResult Delete(int Id)
         {
-            var products = _context.Employees.Find(Id);
-            return View(products);
+            var dept = _context.Jobs.Find(Id);
+            return View(dept);
         }
 
         [HttpPost]
-        public IActionResult Delete(Employee product)
+        public IActionResult Delete(Job dept)
         {
             try
             {
-                _context.Employees.Remove(product);
+                _context.Jobs.Remove(dept);
                 _context.SaveChanges();
                 return RedirectToAction("Index");
 
@@ -137,6 +130,10 @@ namespace Bootcamp4_AspMVC.Controllers
                 return Content("حدث خطا  غير متوقع يرجي مراجهة الدعم الفني:0565455252545");
             }
         }
+
+
+
+
 
 
 

@@ -4,6 +4,7 @@ using Bootcamp4_AspMVC.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bootcamp4_AspMVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250913165910_AddJob")]
+    partial class AddJob
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -71,15 +74,12 @@ namespace Bootcamp4_AspMVC.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("DepartmentId")
+                    b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("JobId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -92,8 +92,6 @@ namespace Bootcamp4_AspMVC.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
-
-                    b.HasIndex("JobId");
 
                     b.ToTable("Employees");
                 });
@@ -147,15 +145,11 @@ namespace Bootcamp4_AspMVC.Migrations
                 {
                     b.HasOne("Bootcamp4_AspMVC.Models.Department", "Department")
                         .WithMany("Employees")
-                        .HasForeignKey("DepartmentId");
-
-                    b.HasOne("Bootcamp4_AspMVC.Models.Job", "Job")
-                        .WithMany("Employees")
-                        .HasForeignKey("JobId");
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Department");
-
-                    b.Navigation("Job");
                 });
 
             modelBuilder.Entity("Bootcamp4_AspMVC.Models.Product", b =>
@@ -173,11 +167,6 @@ namespace Bootcamp4_AspMVC.Migrations
                 });
 
             modelBuilder.Entity("Bootcamp4_AspMVC.Models.Department", b =>
-                {
-                    b.Navigation("Employees");
-                });
-
-            modelBuilder.Entity("Bootcamp4_AspMVC.Models.Job", b =>
                 {
                     b.Navigation("Employees");
                 });

@@ -52,6 +52,26 @@
         </select>
     </div>
 
+    <div class="mb-3">
+        <label asp-for="JobId" class="form-label">Job</label>
+        @*      <select asp-for="CategoryId" name="CategoryId" class="form-control" asp-items="@ViewBag.Categories" >
+        <option selected value="">-- Select Category --</option>
+
+        </select> *@
+
+
+        <select asp-for="JobId" name="JobId" class="form-control">
+            <option selected value="">-- Select Job --</option>
+
+            @foreach (var dept in ViewBag.Jobs)
+            {
+                <option value="@dept.Id">@dept.Name</option>
+            }
+
+
+        </select>
+    </div>
+
 
     <button type="submit" class="btn btn-outline-primary">Edit</button>
     <a asp-action="Index" class="btn btn-dark">Back</a>
