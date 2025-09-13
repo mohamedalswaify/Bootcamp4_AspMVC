@@ -1,0 +1,59 @@
+﻿@model Employee
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit Employee</h1>
+
+<form method="post" asp-action="Edit">
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" name="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" name="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Phone" class="form-label"></label>
+        <input asp-for="Phone" name="Phone" class="form-control" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Address" class="form-label"></label>
+        <input asp-for="Address" name="Address" class="form-control" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DepartmentId" class="form-label"></label>
+        @*      <select asp-for="CategoryId" name="CategoryId" class="form-control" asp-items="@ViewBag.Categories" >
+        <option selected value="">-- Select Category --</option>
+
+        </select> *@
+
+
+        <select asp-for="DepartmentId" name="DepartmentId" class="form-control">
+            <option selected value="">-- Select Department --</option>
+
+            @foreach (var dept in ViewBag.Depts)
+            {
+                <option value="@dept.Id">@dept.Name</option>
+            }
+
+
+        </select>
+    </div>
+
+
+    <button type="submit" class="btn btn-outline-primary">Edit</button>
+    <a asp-action="Index" class="btn btn-dark">Back</a>
+
+</form>
