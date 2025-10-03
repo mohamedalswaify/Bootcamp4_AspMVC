@@ -1,10 +1,12 @@
 ﻿using Bootcamp4_AspMVC.Data;
+using Bootcamp4_AspMVC.Filters;
 using Bootcamp4_AspMVC.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bootcamp4_AspMVC.Controllers
 {
+    [SessionAuthorize]
     public class EmployeesController : Controller
     {
         private readonly ApplicationDbContext _context;

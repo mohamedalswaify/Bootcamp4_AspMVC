@@ -1,9 +1,11 @@
 ﻿using Bootcamp4_AspMVC.Data;
+using Bootcamp4_AspMVC.Filters;
 using Bootcamp4_AspMVC.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bootcamp4_AspMVC.Controllers
 {
+    [SessionAuthorize]
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,6 +21,13 @@ namespace Bootcamp4_AspMVC.Controllers
             try {
 
                 IEnumerable<Category> categories = _context.Categories.ToList();
+                //foreach (var item in categories)
+                //{
+                //    item.Uid = Guid.NewGuid().ToString();
+                //    item.CreatedAt = DateTime.Now;
+                //    _context.Categories.Update(item);
+                //    _context.SaveChanges();
+                //}
                 return View(categories);
 
 
@@ -40,9 +49,10 @@ namespace Bootcamp4_AspMVC.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(Category category)
         {
-           try
+            try
             {
                 if (!ModelState.IsValid)
                 {
@@ -66,14 +76,15 @@ namespace Bootcamp4_AspMVC.Controllers
 
 
         [HttpGet]
-        public IActionResult Edit(int Id)
+        public IActionResult Edit(string Uid)
         {
-            var category = _context.Categories.Find(Id);
+            var category = _context.Categories.FirstOrDefault(e => e.Uid == Uid);
             return View(category);
         }
 
         [HttpPost]
-        public IActionResult Edit(Category category)
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Category category,string Uid)
         {
             try
             {
@@ -83,9 +94,21 @@ namespace Bootcamp4_AspMVC.Controllers
                     return View(category);
 
                 }
-                _context.Categories.Update(category);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
+
+                var cate = _context.Categories.FirstOrDefault(e => e.Uid == Uid);
+                if (cate != null)
+                {
+
+                    cate.Name = category.Name;
+                    cate.Description = category.Description;
+                    _context.Categories.Update(cate);
+                    _context.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+
+                return View(category);
+
+
 
             }
             catch (Exception ex)
@@ -108,6 +131,7 @@ namespace Bootcamp4_AspMVC.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(Category category)
         {
             try
