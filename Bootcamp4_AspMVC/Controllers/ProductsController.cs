@@ -19,6 +19,13 @@ namespace Bootcamp4_AspMVC.Controllers
         public IActionResult Index()
         {
             IEnumerable<Product> Products = _context.Products.Include(c => c.Category).ToList();
+
+            //foreach (var item in Products)
+            //{
+            //    item.Uid = Guid.NewGuid().ToString();
+            //    _context.Products.Update(item);
+            //    _context.SaveChanges();
+            //}
             return View(Products);
         }
 
@@ -46,6 +53,7 @@ namespace Bootcamp4_AspMVC.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(Product product)
         {
             try
@@ -73,14 +81,15 @@ namespace Bootcamp4_AspMVC.Controllers
 
 
         [HttpGet]
-        public IActionResult Edit(int Id)
+        public IActionResult Edit(string Uid)
         {
-            var products = _context.Products.Find(Id);
+            var products = _context.Products.FirstOrDefault(e => e.Uid == Uid);
             createList();
             return View(products);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Edit(Product product)
         {
             try
@@ -91,9 +100,21 @@ namespace Bootcamp4_AspMVC.Controllers
                     return View(product);
 
                 }
-                _context.Products.Update(product);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
+                var prod = _context.Products.FirstOrDefault(e => e.Uid == product.Uid);
+                if (prod != null)
+                {
+
+                    prod.Name = product.Name;
+                    prod.Price = product.Price;
+                    prod.Description = product.Description;
+                    prod.CategoryId = product.CategoryId;
+
+                    _context.Products.Update(prod);
+                    _context.SaveChanges();
+                    return RedirectToAction("Index");
+
+                }
+                return View(product);
 
             }
             catch (Exception ex)
@@ -109,13 +130,18 @@ namespace Bootcamp4_AspMVC.Controllers
 
 
         [HttpGet]
-        public IActionResult Delete(int Id)
+        public IActionResult Delete(string Uid)
         {
-            var products = _context.Products.Find(Id);
-            return View(products);
+            var prod = _context.Products.AsNoTracking().FirstOrDefault(e => e.Uid == Uid);
+            if (prod == null)
+            {
+                return NotFound();
+            }
+            return View(prod);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(Product product)
         {
             try
