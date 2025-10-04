@@ -1,5 +1,6 @@
 ﻿using Bootcamp4_AspMVC.Data;
 using Bootcamp4_AspMVC.Filters;
+using Bootcamp4_AspMVC.Interfaces;
 using Bootcamp4_AspMVC.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,19 +9,25 @@ namespace Bootcamp4_AspMVC.Controllers
     [SessionAuthorize]
     public class CategoryController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        //private readonly ApplicationDbContext _context;
+        private readonly IRepository<Category> _repositoryCategory;
 
-        public CategoryController(ApplicationDbContext context)
+        public CategoryController(IRepository<Category> repository)
         {
-            _context = context;
+            _repositoryCategory = repository;
         }
+        //public CategoryController(ApplicationDbContext context)
+        //{
+        //    _context = context;
+        //}
 
         [HttpGet]
         public IActionResult Index()
         {
             try {
 
-                IEnumerable<Category> categories = _context.Categories.ToList();
+               // IEnumerable<Category> categories = _context.Categories.ToList();
+                IEnumerable<Category> categories = _repositoryCategory.GetAll();
                 //foreach (var item in categories)
                 //{
                 //    item.Uid = Guid.NewGuid().ToString();
@@ -60,8 +67,11 @@ namespace Bootcamp4_AspMVC.Controllers
                     return View(category);
 
                 }
-                _context.Categories.Add(category);
-                _context.SaveChanges();
+                //_context.Categories.Add(category);
+                //_context.SaveChanges();
+
+                _repositoryCategory.Add(category);
+
                 return RedirectToAction("Index");
 
             }
@@ -78,7 +88,9 @@ namespace Bootcamp4_AspMVC.Controllers
         [HttpGet]
         public IActionResult Edit(string Uid)
         {
-            var category = _context.Categories.FirstOrDefault(e => e.Uid == Uid);
+            //var category = _context.Categories.FirstOrDefault(e => e.Uid == Uid);
+            var category = _repositoryCategory.GetByUId(Uid);
+
             return View(category);
         }
 
@@ -95,14 +107,19 @@ namespace Bootcamp4_AspMVC.Controllers
 
                 }
 
-                var cate = _context.Categories.FirstOrDefault(e => e.Uid == Uid);
+               // var cate = _context.Categories.FirstOrDefault(e => e.Uid == Uid);
+                var cate = _repositoryCategory.GetByUId(Uid);
                 if (cate != null)
                 {
 
                     cate.Name = category.Name;
                     cate.Description = category.Description;
-                    _context.Categories.Update(cate);
-                    _context.SaveChanges();
+                    //_context.Categories.Update(cate);
+                    //_context.SaveChanges();
+
+
+                    _repositoryCategory.Update(cate);
+
                     return RedirectToAction("Index");
                 }
 
@@ -126,7 +143,9 @@ namespace Bootcamp4_AspMVC.Controllers
         [HttpGet]
         public IActionResult Delete(int Id)
         {
-            var category = _context.Categories.Find(Id);
+            // var category = _context.Categories.Find(Id);
+            var category = _repositoryCategory.GetById(Id);
+
             return View(category);
         }
 
@@ -136,8 +155,10 @@ namespace Bootcamp4_AspMVC.Controllers
         {
             try
             {
-                _context.Categories.Remove(category);
-                _context.SaveChanges();
+                //_context.Categories.Remove(category);
+                //_context.SaveChanges();
+
+                _repositoryCategory.Delete(category.Id);
                 return RedirectToAction("Index");
 
             }

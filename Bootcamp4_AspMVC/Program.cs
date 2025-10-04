@@ -1,4 +1,6 @@
 using Bootcamp4_AspMVC.Data;
+using Bootcamp4_AspMVC.Interfaces;
+using Bootcamp4_AspMVC.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +21,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options=>options
 .UseSqlServer(connectionString));
 
+builder.Services.AddScoped(typeof(IRepository<>), typeof(MainRepository<>));
 
 
 var app = builder.Build();
