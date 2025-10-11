@@ -2,6 +2,7 @@
 using Bootcamp4_AspMVC.Filters;
 using Bootcamp4_AspMVC.Interfaces;
 using Bootcamp4_AspMVC.Models;
+using Bootcamp4_AspMVC.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,16 +12,22 @@ namespace Bootcamp4_AspMVC.Controllers
     [SessionAuthorize]
     public class ProductsController : Controller
     {
-       // private readonly ApplicationDbContext _context;
+        // private readonly ApplicationDbContext _context;
 
-        private readonly IProductRepo _productRepo;
-        private readonly IRepository<Category> _categoryRepo;
+        //private readonly IProductRepo _productRepo;
+        //private readonly IRepository<Category> _categoryRepo;
 
-        public ProductsController(IProductRepo productRepo, IRepository<Category> categoryRepo)
+        //public ProductsController(IProductRepo productRepo, IRepository<Category> categoryRepo)
+        //{
+        //    //_context = context;
+        //    _productRepo = productRepo;
+        //    _categoryRepo = categoryRepo;
+        //}
+        private readonly IUnitOfWork _unitOfWork;
+        public ProductsController(IUnitOfWork unitOfWork)
         {
-            //_context = context;
-            _productRepo = productRepo;
-            _categoryRepo = categoryRepo;
+            _unitOfWork = unitOfWork;
+
         }
         public IActionResult Index()
         {
@@ -30,7 +37,7 @@ namespace Bootcamp4_AspMVC.Controllers
             //    .ToList();
 
             IEnumerable<Product> Products =
-             _productRepo.GetProductsWithCategory();
+             _unitOfWork._productRepo.GetProductsWithCategory();
 
             //foreach (var item in Products)
             //{
@@ -51,7 +58,7 @@ namespace Bootcamp4_AspMVC.Controllers
             //ViewBag.Categories = selectListItems;
 
             //IEnumerable<Category> categories = _context.Categories.ToList();
-            IEnumerable<Category> categories = _categoryRepo.GetAll();
+            IEnumerable<Category> categories = _unitOfWork._repositoryCategory.GetAll();
             ViewBag.Categories = categories;
         }
 
@@ -80,7 +87,7 @@ namespace Bootcamp4_AspMVC.Controllers
                 //_context.Products.Add(product);
                 //_context.SaveChanges();
 
-                _productRepo.Add(product);
+                _unitOfWork._productRepo.Add(product);
 
 
                 return RedirectToAction("Index");
@@ -102,7 +109,7 @@ namespace Bootcamp4_AspMVC.Controllers
         {
             //var products = _context.Products.FirstOrDefault(e => e.Uid == Uid);
 
-            var products = _productRepo.GetByUId(Uid);
+            var products = _unitOfWork._productRepo.GetByUId(Uid);
             createList();
             return View(products);
         }
@@ -120,7 +127,7 @@ namespace Bootcamp4_AspMVC.Controllers
 
                 }
                 //var prod = _context.Products.FirstOrDefault(e => e.Uid == product.Uid);
-                var prod = _productRepo.GetByUId(product.Uid);
+                var prod = _unitOfWork._productRepo.GetByUId(product.Uid);
                 if (prod != null)
                 {
 
@@ -131,7 +138,7 @@ namespace Bootcamp4_AspMVC.Controllers
 
                     //_context.Products.Update(prod);
                     //_context.SaveChanges();
-                    _productRepo.Update(prod);
+                    _unitOfWork. _productRepo.Update(prod);
 
                     return RedirectToAction("Index");
 
@@ -155,7 +162,7 @@ namespace Bootcamp4_AspMVC.Controllers
         public IActionResult Delete(string Uid)
         {
             //var prod = _context.Products.AsNoTracking().FirstOrDefault(e => e.Uid == Uid);
-            var prod = _productRepo.GetByUId(Uid);
+            var prod = _unitOfWork._productRepo.GetByUId(Uid);
 
             if (prod == null)
             {
@@ -172,7 +179,7 @@ namespace Bootcamp4_AspMVC.Controllers
             {
                 //_context.Products.Remove(product);
                 //_context.SaveChanges();
-                _productRepo.Delete(product.Id);
+                _unitOfWork._productRepo.Delete(product.Id);
                 return RedirectToAction("Index");
 
             }
