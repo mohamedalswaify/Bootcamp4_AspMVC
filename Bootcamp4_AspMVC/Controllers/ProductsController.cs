@@ -1,5 +1,6 @@
 ﻿using Bootcamp4_AspMVC.Data;
 using Bootcamp4_AspMVC.Filters;
+using Bootcamp4_AspMVC.Interfaces;
 using Bootcamp4_AspMVC.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -10,15 +11,26 @@ namespace Bootcamp4_AspMVC.Controllers
     [SessionAuthorize]
     public class ProductsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+       // private readonly ApplicationDbContext _context;
 
-        public ProductsController(ApplicationDbContext context)
+        private readonly IProductRepo _productRepo;
+        private readonly IRepository<Category> _categoryRepo;
+
+        public ProductsController(IProductRepo productRepo, IRepository<Category> categoryRepo)
         {
-            _context = context;
+            //_context = context;
+            _productRepo = productRepo;
+            _categoryRepo = categoryRepo;
         }
         public IActionResult Index()
         {
-            IEnumerable<Product> Products = _context.Products.Include(c => c.Category).ToList();
+            //IEnumerable<Product> Products = 
+            //    _context.Products
+            //    .Include(c => c.Category)
+            //    .ToList();
+
+            IEnumerable<Product> Products =
+             _productRepo.GetProductsWithCategory();
 
             //foreach (var item in Products)
             //{
@@ -38,7 +50,8 @@ namespace Bootcamp4_AspMVC.Controllers
             //SelectList selectListItems = new SelectList(categories,"Id","Name");
             //ViewBag.Categories = selectListItems;
 
-            IEnumerable<Category> categories = _context.Categories.ToList();
+            //IEnumerable<Category> categories = _context.Categories.ToList();
+            IEnumerable<Category> categories = _categoryRepo.GetAll();
             ViewBag.Categories = categories;
         }
 
@@ -64,8 +77,12 @@ namespace Bootcamp4_AspMVC.Controllers
                     return View(product);
 
                 }
-                _context.Products.Add(product);
-                _context.SaveChanges();
+                //_context.Products.Add(product);
+                //_context.SaveChanges();
+
+                _productRepo.Add(product);
+
+
                 return RedirectToAction("Index");
 
             }
@@ -83,7 +100,9 @@ namespace Bootcamp4_AspMVC.Controllers
         [HttpGet]
         public IActionResult Edit(string Uid)
         {
-            var products = _context.Products.FirstOrDefault(e => e.Uid == Uid);
+            //var products = _context.Products.FirstOrDefault(e => e.Uid == Uid);
+
+            var products = _productRepo.GetByUId(Uid);
             createList();
             return View(products);
         }
@@ -100,7 +119,8 @@ namespace Bootcamp4_AspMVC.Controllers
                     return View(product);
 
                 }
-                var prod = _context.Products.FirstOrDefault(e => e.Uid == product.Uid);
+                //var prod = _context.Products.FirstOrDefault(e => e.Uid == product.Uid);
+                var prod = _productRepo.GetByUId(product.Uid);
                 if (prod != null)
                 {
 
@@ -109,8 +129,10 @@ namespace Bootcamp4_AspMVC.Controllers
                     prod.Description = product.Description;
                     prod.CategoryId = product.CategoryId;
 
-                    _context.Products.Update(prod);
-                    _context.SaveChanges();
+                    //_context.Products.Update(prod);
+                    //_context.SaveChanges();
+                    _productRepo.Update(prod);
+
                     return RedirectToAction("Index");
 
                 }
@@ -132,7 +154,9 @@ namespace Bootcamp4_AspMVC.Controllers
         [HttpGet]
         public IActionResult Delete(string Uid)
         {
-            var prod = _context.Products.AsNoTracking().FirstOrDefault(e => e.Uid == Uid);
+            //var prod = _context.Products.AsNoTracking().FirstOrDefault(e => e.Uid == Uid);
+            var prod = _productRepo.GetByUId(Uid);
+
             if (prod == null)
             {
                 return NotFound();
@@ -146,8 +170,9 @@ namespace Bootcamp4_AspMVC.Controllers
         {
             try
             {
-                _context.Products.Remove(product);
-                _context.SaveChanges();
+                //_context.Products.Remove(product);
+                //_context.SaveChanges();
+                _productRepo.Delete(product.Id);
                 return RedirectToAction("Index");
 
             }

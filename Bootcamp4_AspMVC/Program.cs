@@ -22,6 +22,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options=>options
 .UseSqlServer(connectionString));
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(MainRepository<>));
+builder.Services.AddScoped(typeof(IProductRepo), typeof(ProductRepo));
 
 
 var app = builder.Build();
