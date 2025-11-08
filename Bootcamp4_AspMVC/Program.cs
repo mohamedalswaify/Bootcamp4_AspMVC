@@ -29,6 +29,7 @@ builder.Services.AddScoped(typeof(IProductRepo), typeof(ProductRepo));
 builder.Services.AddScoped(typeof(IEmployeeRepo), typeof(EmployeeRepo));
 builder.Services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
 builder.Services.AddScoped(typeof(ICategoryService), typeof(CategoryService));
+builder.Services.AddScoped(typeof(IUserService), typeof(UserService));
 
 
 var app = builder.Build();

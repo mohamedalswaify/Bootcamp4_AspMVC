@@ -9,7 +9,10 @@ namespace Bootcamp4_AspMVC.Interfaces
         IEmployeeRepo _employeeRepo { get; }
         IRepository<Department> _repositoryDepartment { get; }
         IRepository<Job> _repositoryJob { get; }
-        IRepository<Category> _repositoryCategory { get; }
+        IRepository<User> _repositoryUser { get; }
+
+        // IRepository<Category> _repositoryCategory { get; }
+        ICategoryRepo _repositoryCategory { get; }
         IProductRepo _productRepo { get; }
 
         void Save();

@@ -43,6 +43,12 @@ namespace Bootcamp4_AspMVC.Serivces
 
         }
 
+        public IEnumerable<Category> GetAllCategoriesWithProducts()
+        {
+            return _unitOfWork._repositoryCategory.GetCategoriesWithProducts();
+
+        }
+
         public Category? GetByUid(string uid)
         {
             return _unitOfWork._repositoryCategory.GetByUId(uid);

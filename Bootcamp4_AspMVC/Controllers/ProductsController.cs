@@ -24,9 +24,11 @@ namespace Bootcamp4_AspMVC.Controllers
         //    _categoryRepo = categoryRepo;
         //}
         private readonly IUnitOfWork _unitOfWork;
-        public ProductsController(IUnitOfWork unitOfWork)
+        private readonly IWebHostEnvironment _env;
+        public ProductsController(IUnitOfWork unitOfWork, IWebHostEnvironment env)
         {
             _unitOfWork = unitOfWork;
+            _env = env;
 
         }
         public IActionResult Index()
@@ -72,6 +74,58 @@ namespace Bootcamp4_AspMVC.Controllers
             return View();
         }
 
+
+
+        private string? SaveImage(IFormFile? file)
+        {
+            if (file == null || file.Length == 0) return null;
+
+            // التحقق من الامتداد (اختياري لكنه مهم)
+            // في حاله رفع جميع انواع الملفات قد يؤدي الي مشاكل امنيه لذلك نحدد امتدادات مسموحه ونحظر الباقي مثل  .exe .dll .cs الخ
+            var allowed = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!allowed.Contains(ext))
+                throw new InvalidOperationException("امتداد الملف غير مسموح");
+
+            // مسار المجلد داخل wwwroot
+            var folder = Path.Combine("uploads", "products");
+            var rootFolder = Path.Combine(_env.WebRootPath, folder);
+
+            // إنشاء المجلد لو غير موجود
+            Directory.CreateDirectory(rootFolder);
+
+            // اسم ملف فريد
+            var fileName = $"{Guid.NewGuid():N}{ext}";
+            var fullPath = Path.Combine(rootFolder, fileName);
+
+            using (var stream = System.IO.File.Create(fullPath))
+            {
+                file.CopyTo(stream);
+            }
+
+            // نعيد المسار النسبي للاستخدام في <img src="~/{path}">
+            var relativePath = Path.Combine(folder, fileName).Replace('\\', '/');
+            return "/" + relativePath;
+        }
+
+
+
+        private void DeleteImageIfExists(string? relativePath)
+        {
+            if (string.IsNullOrWhiteSpace(relativePath)) return;
+
+            var fullPath = Path.Combine(_env.WebRootPath, relativePath.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+            if (System.IO.File.Exists(fullPath))
+            {
+                System.IO.File.Delete(fullPath);
+            }
+        }
+
+
+
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Product product)
@@ -87,7 +141,16 @@ namespace Bootcamp4_AspMVC.Controllers
                 //_context.Products.Add(product);
                 //_context.SaveChanges();
 
-                _unitOfWork._productRepo.Add(product);
+
+                if (product.ImageFile != null)
+                {
+                    // حفظ الصورة في المجلد وإرجاع المسار النسبي
+                    var imagePath = SaveImage(product.ImageFile);
+                    product.ImageUrl = imagePath;
+                }
+
+
+                    _unitOfWork._productRepo.Add(product);
 
 
                 return RedirectToAction("Index");
@@ -138,7 +201,17 @@ namespace Bootcamp4_AspMVC.Controllers
 
                     //_context.Products.Update(prod);
                     //_context.SaveChanges();
+
+                    if (product.ImageFile != null)
+                    {
+                        // حفظ الصورة في المجلد وإرجاع المسار النسبي
+                        var imagePath = SaveImage(product.ImageFile);
+                        prod.ImageUrl = imagePath;
+                    }
+
+
                     _unitOfWork. _productRepo.Update(prod);
+                    _unitOfWork.Save();
 
                     return RedirectToAction("Index");
 

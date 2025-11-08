@@ -20,13 +20,19 @@ namespace Bootcamp4_Asp_API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Category>> GatAll()
+        public ActionResult<IEnumerable<CategoryListDto>> GatAll()
         {
             try
             {
 
-                IEnumerable<Category> categories = _categoryService.GetAll();
-                return Ok(categories);
+                IEnumerable<Category> categories = _categoryService.GetAllCategoriesWithProducts();
+                var categoriesDto = categories.Select(c => new CategoryListDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    ProductCount = c.Products.Count(),
+                });
+                return Ok(categoriesDto);
             }
             catch (Exception ex)
             {

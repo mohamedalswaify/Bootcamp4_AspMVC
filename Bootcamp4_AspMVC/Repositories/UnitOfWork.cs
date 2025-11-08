@@ -13,8 +13,10 @@ namespace Bootcamp4_AspMVC.Repositories
             _employeeRepo = new EmployeeRepo(_context);
             _repositoryDepartment = new MainRepository<Department>(_context);
             _repositoryJob = new MainRepository<Job>(_context);
-            _repositoryCategory = new MainRepository<Category>(_context);
+           // _repositoryCategory = new MainRepository<Category>(_context);
+            _repositoryCategory = new CategoryRepo(_context);
             _productRepo = new ProductRepo(_context);
+            _repositoryUser = new MainRepository<User>(_context);
 
         }
 
@@ -27,7 +29,9 @@ namespace Bootcamp4_AspMVC.Repositories
         public IRepository<Department> _repositoryDepartment { get; }
 
         public IRepository<Job> _repositoryJob { get; }
-        public IRepository<Category> _repositoryCategory { get; }
+        public IRepository<User> _repositoryUser { get; }
+        //public IRepository<Category> _repositoryCategory { get; }
+        public ICategoryRepo _repositoryCategory { get; }
         public IProductRepo _productRepo { get; } 
         public void Save()
         {
